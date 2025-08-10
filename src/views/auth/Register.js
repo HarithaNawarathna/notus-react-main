@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useHistory, Link } from "react-router-dom/cjs/react-router-dom";
-import ceb from "../../assets/img/ceb.png"
+import ceb from "../../assets/img/ceb.png";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -26,7 +26,7 @@ export default function Register() {
       return;
     }
     try {
-      const response = await fetch(`${baseUrl}/api/v1/register`, {
+      const response = await fetch(`http://127.0.0.1:8088/EV/api/v1/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,6 +38,7 @@ export default function Register() {
           eaccountNo: eAccountNo,
           password,
         }),
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -62,11 +63,8 @@ export default function Register() {
         <div className="flex content-center items-center justify-center h-full">
           <div className="w-full lg:w-4/12 px-4">
             <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200 border-0">
-            <div className="flex justify-center items-center mt-8">
-                <img 
-                alt="ceb logo"
-                className="w-20 h-20"
-                src={ceb}/>
+              <div className="flex justify-center items-center mt-8">
+                <img alt="ceb logo" className="w-20 h-20" src={ceb} />
               </div>
               <div className="flex-auto px-4 lg:px-10 py-10 pt-0 mt-2">
                 <div className="text-blueGray-400 text-center text-sm">
@@ -120,13 +118,14 @@ export default function Register() {
                       maxLength={10}
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (/^\d*$/.test(value)) { // Only allow digits (0-9)
-                          // console.log("Updated eAccountNo:", value); 
+                        if (/^\d*$/.test(value)) {
+                          // Only allow digits (0-9)
+                          // console.log("Updated eAccountNo:", value);
                           seteAccountNo(value);
                         }
                       }}
                     />
-                    {eAccountNo.length<10 && eAccountNo.length > 0 && (
+                    {eAccountNo.length < 10 && eAccountNo.length > 0 && (
                       <p className="text-red-500 text-xs mt-1">
                         10 digit account number required. eg:1234567890"
                       </p>
@@ -190,7 +189,7 @@ export default function Register() {
             </div>
             <div className="flex flex-wrap mt-6 justify-center relative">
               <div className="w-1/2 text-blueGray-400 text-sm">
-              Have an account?{" "}
+                Have an account?{" "}
                 <Link to="/auth/login" className="text-blueGray-600 text-sm">
                   Sign In
                 </Link>

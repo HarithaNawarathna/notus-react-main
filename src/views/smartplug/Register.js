@@ -66,15 +66,18 @@ const Tabs = () => {
     console.log("station data:", stationData);
 
     try {
-      const response = await fetch(`${baseUrl}/api/charging-stations`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          Authorization: "Basic " + btoa("user:admin123"),
-        },
-        body: JSON.stringify(stationData),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8088/EV/api/charging-stations`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: "Basic " + btoa("user:admin123"),
+          },
+          body: JSON.stringify(stationData),
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("failed to register the charging station");
@@ -104,26 +107,25 @@ const Tabs = () => {
   };
 
   const handleScan = async (data) => {
-  if (data) {
-    try {
-      const jsonData = JSON.parse(data);
-      setScannedData(jsonData);
-      console.log("scanned data:", jsonData);
+    if (data) {
+      try {
+        const jsonData = JSON.parse(data);
+        setScannedData(jsonData);
+        console.log("scanned data:", jsonData);
 
-      toast.success("QR code scanned successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    } catch (err) {
-      console.error("invalid QR code:", err);
-      toast.error("Invalid QR code", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+        toast.success("QR code scanned successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } catch (err) {
+        console.error("invalid QR code:", err);
+        toast.error("Invalid QR code", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
     }
-  }
-};
-
+  };
 
   const handleError = (err) => {
     console.error("qr scan error:", err);

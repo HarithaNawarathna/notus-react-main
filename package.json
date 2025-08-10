@@ -38,6 +38,7 @@
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm run build:tailwind && npm start",
     "build:tailwind": "tailwind build src/assets/styles/index.css -o src/assets/styles/tailwind.css"
   },
+  "proxy": "http://127.0.0.1:8088",
   "eslintConfig": {
     "extends": "react-app"
   },

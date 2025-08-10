@@ -32,7 +32,7 @@ export default function Login() {
   //       //const userlevel = data.userLevel; // Ensure the backend sends this value
 
   //       const data = response.data;
-        
+
   //       sessionStorage.setItem("email", data.email);
   //       const userlevel = sessionStorage.setItem("userLevel", data.userLevel);
   //       sessionStorage.setItem("eAccountNo", data.eAccountNo);
@@ -60,21 +60,24 @@ export default function Login() {
   //   }
   // };
 
-  const baseUrl = process.env.REACT_APP_API_BASE_URL;
+  const baseUrl =
+    process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8088/EV";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${baseUrl}/api/v1/login`, {
+      const response = await fetch(`http://127.0.0.1:8088/EV/api/v1/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Basic " + btoa("user:admin123"),
         },
         body: JSON.stringify({ email, password }),
-        credentials: "include", // Include cookies in the request
+        credentials: "include",
       });
-  
+
+      console.log("POSTing to:", `${baseUrl}/api/v1/login`);
+
       const contentType = response.headers.get("content-type");
       let data;
       if (contentType && contentType.indexOf("application/json") !== -1) {
@@ -83,23 +86,23 @@ export default function Login() {
         data = await response.text();
         throw new Error("Unexpected response format: " + data);
       }
-  
+
       if (response.ok) {
         // Store in sessionStorage
         sessionStorage.setItem("email", data.email);
         sessionStorage.setItem("userLevel", data.userLevel);
         sessionStorage.setItem("eAccountNo", data.eAccountNo);
         sessionStorage.setItem("sessionStart", Date.now().toString());
-  
+
         const userlevel = data.userLevel;
-  
+
         console.log("Session storage saved:", {
           email: sessionStorage.getItem("email"),
           userLevel: sessionStorage.getItem("userLevel"),
           eAccountNo: sessionStorage.getItem("eAccountNo"),
           sessionStart: sessionStorage.getItem("sessionStart"),
         });
-  
+
         // Redirect based on user level
         if (userlevel === "CE") {
           history.push("/admin/dashboardCE");
@@ -108,7 +111,7 @@ export default function Login() {
         } else {
           history.push("/admin/maps");
         }
-  
+
         alert("Login successful");
       } else {
         alert(
@@ -120,7 +123,7 @@ export default function Login() {
       console.error("Error:", error.message || error);
     }
   };
-  
+
   return (
     <>
       <div className="container mx-auto px-4 h-full">
@@ -133,7 +136,7 @@ export default function Login() {
               </div>
               <div className="flex-auto px-4 lg:px-10 py-10 pt-0 mt-2">
                 <div className="text-blueGray-400 text-center text-sm">
-                  Sign In With Credentials
+                  Sign In With Credentials 3.0
                 </div>
                 <form onSubmit={handleSubmit}>
                   <div className="relative w-full mb-3">

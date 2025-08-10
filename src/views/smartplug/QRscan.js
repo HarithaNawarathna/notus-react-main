@@ -23,22 +23,26 @@ function QRscan() {
                   if (result) {
                     const data = result.text;
                     setScanResult(data);
-                
-                    fetch("http://localhost:8080/api/qrcodes", { // use your backend url
+
+                    fetch("http://127.0.0.1:8088/EV/api/qrcodes", {
+                      // use your backend url
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
                       },
                       body: JSON.stringify({ data }), // match your dto field name
-                    }).catch(err => console.error("failed to save qr code:", err));
+                    }).catch((err) =>
+                      console.error("failed to save qr code:", err)
+                    );
                   }
                 }}
-                
               />
               {scanResult && (
                 <div className="mt-4 p-2 bg-white shadow rounded text-center">
                   <p className="text-lg font-semibold">Scanned QR Code:</p>
-                  <p className="break-words text-sm text-gray-700">{scanResult}</p>
+                  <p className="break-words text-sm text-gray-700">
+                    {scanResult}
+                  </p>
                 </div>
               )}
             </div>

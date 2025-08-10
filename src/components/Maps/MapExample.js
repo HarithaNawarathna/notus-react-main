@@ -12,9 +12,11 @@ function MapExample() {
   const routeControlRef = useRef(null);
   let userMarker = null; // Store reference to user's marker
 
+  const baseUrl = process.env.REACT_APP_API_BASE_URL;
+
   // Fetch charging stations from backend
   useEffect(() => {
-    fetch("http://127.0.0.1:8088/EVProject-0.0.1-SNAPSHOT/api/charging-stations")
+    fetch(`http://localhost:8088/EV/api/charging-stations`)
       .then((response) => response.json())
       .then((data) => {
         console.log("Fetched Locations:", data);
@@ -91,12 +93,15 @@ function MapExample() {
     });
 
     locations.forEach((location) => {
-      const icon = iconStatus[location.status?.toLowerCase()] || iconStatus.available;
+      const icon =
+        iconStatus[location.status?.toLowerCase()] || iconStatus.available;
 
       L.marker([location.latitude, location.longitude], { icon })
         .addTo(map)
         .bindPopup(
-          `<b>${location.name}</b><br>Status: ${location.status}<br>Charge: ${location.chargeLevel || 0}%`
+          `<b>${location.name}</b><br>Status: ${location.status}<br>Charge: ${
+            location.chargeLevel || 0
+          }%`
         );
     });
 
@@ -105,16 +110,19 @@ function MapExample() {
     legend.onAdd = function () {
       const div = L.DomUtil.create("div", "info legend");
       div.innerHTML += "<h4>Station Status</h4>";
-      div.innerHTML += '<div><span style="display:inline-block; width:12px; height:12px; background:green; margin-right:5px;"></span> Available</div>';
-      div.innerHTML += '<div><span style="display:inline-block; width:12px; height:12px; background:blue; margin-right:5px;"></span> Occupied</div>';
-      div.innerHTML += '<div><span style="display:inline-block; width:12px; height:12px; background:red; margin-right:5px;"></span> Unplugged</div>';
+      div.innerHTML +=
+        '<div><span style="display:inline-block; width:12px; height:12px; background:green; margin-right:5px;"></span> Available</div>';
+      div.innerHTML +=
+        '<div><span style="display:inline-block; width:12px; height:12px; background:blue; margin-right:5px;"></span> Occupied</div>';
+      div.innerHTML +=
+        '<div><span style="display:inline-block; width:12px; height:12px; background:red; margin-right:5px;"></span> Unplugged</div>';
       div.style.background = "white";
       div.style.padding = "10px";
       div.style.borderRadius = "5px";
       div.style.boxShadow = "0 0 5px rgba(0,0,0,0.3)";
       return div;
     };
-    
+
     legend.addTo(map);
   }, [map, locations]);
 
@@ -154,8 +162,14 @@ function MapExample() {
           if (availableStations.length === 0) return;
 
           const nearestStation = availableStations.reduce((prev, curr) => {
-            const prevDist = Math.hypot(userLat - prev.latitude, userLng - prev.longitude);
-            const currDist = Math.hypot(userLat - curr.latitude, userLng - curr.longitude);
+            const prevDist = Math.hypot(
+              userLat - prev.latitude,
+              userLng - prev.longitude
+            );
+            const currDist = Math.hypot(
+              userLat - curr.latitude,
+              userLng - curr.longitude
+            );
             return prevDist < currDist ? prev : curr;
           });
 
