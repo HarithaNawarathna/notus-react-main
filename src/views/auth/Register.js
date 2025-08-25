@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useHistory, Link } from "react-router-dom/cjs/react-router-dom";
 import ceb from "../../assets/img/ceb.png";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [eAccountNo, seteAccountNo] = useState("");
+  const [isRegistered, setIsRegistered] = useState(false);
   const history = useHistory();
 
   const validatePassword = (password) => {
@@ -25,6 +27,7 @@ export default function Register() {
       );
       return;
     }
+    setIsRegistered(true);
     try {
       const response = await fetch(`${baseUrl}/api/v1/register`, {
         method: "POST",
@@ -50,11 +53,15 @@ export default function Register() {
       const data = await response.json();
       console.log("Registration successful", data);
       // Handle successful registration (e.g., redirect to login page)
-      alert("Registration successful");
+      toast.success("Registration successful! Please log in.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       history.push("/auth/login");
     } catch (error) {
       console.error("Registration failed", error);
       // Handle registration error
+      setIsRegistered(false);
     }
   };
   return (
@@ -180,8 +187,9 @@ export default function Register() {
                       className="text-white active:bg-red-600 text-sm px-6 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
                       type="submit"
                       style={{ backgroundColor: "#7c0000" }}
+                      disabled={isRegistered}
                     >
-                      Create Account
+                      {isRegistered ? "Registering..." : "Create Account"}
                     </button>
                   </div>
                 </form>
@@ -197,6 +205,7 @@ export default function Register() {
             </div>
           </div>
         </div>
+        <ToastContainer />
       </div>
     </>
   );

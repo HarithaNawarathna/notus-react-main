@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import ceb from "../../assets/img/ceb.png";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -112,7 +113,11 @@ export default function Login() {
           history.push("/admin/maps");
         }
 
-        alert("Login successful");
+        // alert("Login successful");
+        toast.success("Login successful!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
       } else {
         alert(
           "If you don't have an account, please register. If registered, verify your email. Otherwise, check your email and password."

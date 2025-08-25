@@ -66,18 +66,15 @@ const Tabs = () => {
     console.log("station data:", stationData);
 
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8088/EV/api/charging-stations`,
-        {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            Authorization: "Basic " + btoa("user:admin123"),
-          },
-          body: JSON.stringify(stationData),
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${baseUrl}/EV/api/charging-stations`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          Authorization: "Basic " + btoa("user:admin123"),
+        },
+        body: JSON.stringify(stationData),
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error("failed to register the charging station");
@@ -137,7 +134,7 @@ const Tabs = () => {
         <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded p-1">
           <div className="flex justify-between items-center mb-4 mt-4 relative w-full px-6">
             <div className="relative flex-1 flex flex-col ">
-              <span className="text-xxl mt-2 font-bold">
+              <span className="text-xxl mt-8 font-bold text-black">
                 Charging Station Registration
               </span>
             </div>
