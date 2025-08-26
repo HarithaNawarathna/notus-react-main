@@ -16,11 +16,11 @@ export default function Navbar() {
         <div className="w-full mx-autp items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
           {/* Brand */}
           <a
-            className="text-white text-sm uppercase hidden lg:inline-block font-semibold "
+            className="text-black text-sm uppercase hidden lg:inline-block font-semibold"
             href="#"
             onClick={(e) => e.preventDefault()}
           >
-            {isSmartPlugPage ? "" : "Dashboard"}
+            {isSmartPlugPage ? "Smart Plug Registration" : "Dashboard"}
           </a>
           {/* Form */}
           <form className="md:flex hidden flex-row flex-wrap items-center lg:ml-auto mr-3">

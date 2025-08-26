@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory, Link } from "react-router-dom/cjs/react-router-dom";
 import ceb from "../../assets/img/ceb.png";
 import { ToastContainer, toast } from "react-toastify";
@@ -8,8 +8,45 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [eAccountNo, seteAccountNo] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [apiError, setApiError] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
   const history = useHistory();
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (eAccountNo.length >= 3) {
+        try {
+          const response = await fetch(
+            `http://mrms.ceb:5555/api/BulkDetail/GetBulkCustomerDetails?account_no=${eAccountNo}`
+          );
+          const data = await response.json();
+          setSuggestions(data || []);
+          if (data && data.is_success) {
+            setApiError(""); // Set error message
+            setSuggestions(data ? [data] : []);
+          } else if (data && !data.is_success) {
+            setApiError(data.error_message || "Unknown error"); // Clear error if no error_message
+            setSuggestions(data || []);
+          } else {
+            setSuggestions([]);
+            setApiError("Unknown error");
+          }
+          console.log(data);
+        } catch (err) {
+          console.error("Error fetching suggestions:", err);
+          setApiError("Error fetching suggestions");
+          setSuggestions([]);
+        }
+      } else {
+        setSuggestions([]);
+        setApiError("");
+      }
+    };
+
+    const delayDebounce = setTimeout(fetchSuggestions, 400);
+    return () => clearTimeout(delayDebounce);
+  }, [eAccountNo]);
 
   const validatePassword = (password) => {
     const strongPasswordRegex =
@@ -136,6 +173,35 @@ export default function Register() {
                       <p className="text-red-500 text-xs mt-1">
                         10 digit account number required. eg:1234567890"
                       </p>
+                    )}
+
+                    {apiError ? (
+                      <p className="text-red-500 text-xs mt-1">{apiError}</p>
+                    ) : (
+                      eAccountNo.length === 10 &&
+                      suggestions.length > 0 &&
+                      suggestions[0].is_success && (
+                        <p className="text-green-600 text-xs mt-1">
+                          ✅Account number successfully added!
+                        </p>
+                      )
+                    )}
+
+                    {suggestions.length > 0 && (
+                      <ul className="absolute bg-white border rounded shadow-md mt-1 w-full max-h-40 overflow-y-auto z-10">
+                        {suggestions.map((item, index) => (
+                          <li
+                            key={index}
+                            className="px-3 py-2 hover:bg-blue-100 cursor-pointer text-sm"
+                            onClick={() => {
+                              seteAccountNo(item); // Autofill on click
+                              setSuggestions([]); // Hide dropdown
+                            }}
+                          >
+                            {item.eAccountNo}
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </div>
 

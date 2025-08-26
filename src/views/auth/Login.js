@@ -141,7 +141,7 @@ export default function Login() {
               </div>
               <div className="flex-auto px-4 lg:px-10 py-10 pt-0 mt-2">
                 <div className="text-blueGray-400 text-center text-sm">
-                  Sign In With Credentials 3.0
+                  Sign In With Credentials 4.0
                 </div>
                 <form onSubmit={handleSubmit}>
                   <div className="relative w-full mb-3">
