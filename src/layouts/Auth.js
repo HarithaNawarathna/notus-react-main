@@ -10,6 +10,7 @@ import FooterSmall from "components/Footers/FooterSmall.js";
 // views
 
 import Login from "views/auth/Login.js";
+import Otp from "views/auth/Otp.js";
 import Register from "views/auth/Register.js";
 import ResetPassword from "views/auth/ResetPassword";
 import FogotPassword from "views/auth/FogotPassword";
@@ -27,13 +28,14 @@ export default function Auth() {
             className="absolute top-0 w-full h-full bg-white bg-no-repeat bg-full"
             style={{
               backgroundImage: `url(${ceblogo})`,
-              backgroundPosition: "bottom", 
-              opacity:0.6,
+              backgroundPosition: "bottom",
+              opacity: 0.6,
               zIndex: -1,
             }}
           ></div>
           <Switch>
             <Route path="/auth/login" exact component={Login} />
+            <Route path="/auth/otp" exact component={Otp} />
             <Route path="/auth/register" exact component={Register} />
             <Route path="/auth/reset" exact component={ResetPassword} />
             <Route path="/auth/forgot" exact component={FogotPassword} />

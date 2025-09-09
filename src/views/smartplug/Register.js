@@ -66,11 +66,10 @@ const Tabs = () => {
     console.log("station data:", stationData);
 
     try {
-      const response = await fetch(`${baseUrl}/EV/api/charging-stations`, {
+      const response = await fetch(`${baseUrl}/api/charging-stations`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          Authorization: "Basic " + btoa("user:admin123"),
         },
         body: JSON.stringify(stationData),
         credentials: "include",

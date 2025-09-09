@@ -1,52 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useHistory, Link } from "react-router-dom/cjs/react-router-dom";
 import ceb from "../../assets/img/ceb.png";
-import { ToastContainer, toast } from "react-toastify";
 
 export default function Register() {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [eAccountNo, seteAccountNo] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-  const [apiError, setApiError] = useState("");
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [eaccount_no, setEaccountNo] = useState("");
+  const [role, setRole] = useState("USER");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [noOfVehiclesOwned, setNoOfVehiclesOwned] = useState(1);
+  const [address, setAddress] = useState("");
+  const [solarCapacity, setSolarCapacity] = useState("");
+
   const history = useHistory();
-
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (eAccountNo.length >= 3) {
-        try {
-          const response = await fetch(
-            `http://mrms.ceb:5555/api/BulkDetail/GetBulkCustomerDetails?account_no=${eAccountNo}`
-          );
-          const data = await response.json();
-          setSuggestions(data || []);
-          if (data && data.is_success) {
-            setApiError(""); // Set error message
-            setSuggestions(data ? [data] : []);
-          } else if (data && !data.is_success) {
-            setApiError(data.error_message || "Unknown error"); // Clear error if no error_message
-            setSuggestions(data || []);
-          } else {
-            setSuggestions([]);
-            setApiError("Unknown error");
-          }
-          console.log(data);
-        } catch (err) {
-          console.error("Error fetching suggestions:", err);
-          setApiError("Error fetching suggestions");
-          setSuggestions([]);
-        }
-      } else {
-        setSuggestions([]);
-        setApiError("");
-      }
-    };
-
-    const delayDebounce = setTimeout(fetchSuggestions, 400);
-    return () => clearTimeout(delayDebounce);
-  }, [eAccountNo]);
+  const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
   const validatePassword = (password) => {
     const strongPasswordRegex =
@@ -54,8 +22,6 @@ export default function Register() {
     return strongPasswordRegex.test(password);
   };
 
-  const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  //console.log("Base URL:", baseUrl);
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validatePassword(password)) {
@@ -64,43 +30,44 @@ export default function Register() {
       );
       return;
     }
-    setIsRegistered(true);
     try {
-      const response = await fetch(`${baseUrl}/api/v1/register`, {
+      const response = await fetch(`${baseUrl}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Basic " + btoa("user:admin123"),
         },
         body: JSON.stringify({
-          name,
+          username,
           email,
-          eaccountNo: eAccountNo,
+          eaccount_no,
           password,
+          role,
+          mobileNumber: role === "EVOWNER" ? mobileNumber : undefined,
+          noOfVehiclesOwned: role === "EVOWNER" ? noOfVehiclesOwned : undefined,
+          address: role === "ROOFTOPSOLAROWNER" ? address : undefined,
+          solarCapacity:
+            role === "ROOFTOPSOLAROWNER" ? solarCapacity : undefined,
         }),
-        credentials: "include",
       });
 
       if (!response.ok) {
-        alert("Email Already Registered");
+        const errData = await response.json();
+        alert(errData.message || "Registration failed");
         history.push("/auth/login");
-        throw new Error("Registration failed");
+        return;
       }
 
       const data = await response.json();
       console.log("Registration successful", data);
-      // Handle successful registration (e.g., redirect to login page)
-      toast.success("Registration successful! Please log in.", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      history.push("/auth/login");
+      alert("Registration successful. Please verify OTP.");
+      sessionStorage.setItem("pendingUser", username);
+      sessionStorage.setItem("pendingRole", role);
+      history.push("/auth/otp");
     } catch (error) {
       console.error("Registration failed", error);
-      // Handle registration error
-      setIsRegistered(false);
     }
   };
+
   return (
     <>
       <div className="container mx-auto px-4 h-full">
@@ -115,27 +82,23 @@ export default function Register() {
                   Sign Up With Credentials
                 </div>
                 <form onSubmit={handleSubmit}>
+                  {/* Username */}
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block text-blueGray-600 text-sm mb-2"
-                      htmlFor="grid-password"
-                    >
-                      Name
+                    <label className="block text-blueGray-600 text-sm mb-2">
+                      User Name
                     </label>
                     <input
                       type="text"
                       className="border-0 px-3 h-0.5 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      placeholder="User Name"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
 
+                  {/* Email */}
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block text-blueGray-600 text-sm mb-2"
-                      htmlFor="grid-password"
-                    >
+                    <label className="block text-blueGray-600 text-sm mb-2">
                       Email
                     </label>
                     <input
@@ -147,69 +110,32 @@ export default function Register() {
                     />
                   </div>
 
+                  {/* E-account number */}
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block text-blueGray-600 text-sm mb-2"
-                      htmlFor="grid-password"
-                    >
+                    <label className="block text-blueGray-600 text-sm mb-2">
                       Electricity Account Number
                     </label>
                     <input
                       type="text"
                       className="border-0 px-3 h-0.5 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                       placeholder="Electricity Account Number"
-                      value={eAccountNo}
+                      value={eaccount_no}
                       maxLength={10}
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (/^\d*$/.test(value)) {
-                          // Only allow digits (0-9)
-                          // console.log("Updated eAccountNo:", value);
-                          seteAccountNo(value);
-                        }
+                        if (/^\d*$/.test(value)) setEaccountNo(value);
                       }}
                     />
-                    {eAccountNo.length < 10 && eAccountNo.length > 0 && (
+                    {eaccount_no.length < 10 && eaccount_no.length > 0 && (
                       <p className="text-red-500 text-xs mt-1">
-                        10 digit account number required. eg:1234567890"
+                        10 digit account number required. eg:1234567890
                       </p>
-                    )}
-
-                    {apiError ? (
-                      <p className="text-red-500 text-xs mt-1">{apiError}</p>
-                    ) : (
-                      eAccountNo.length === 10 &&
-                      suggestions.length > 0 &&
-                      suggestions[0].is_success && (
-                        <p className="text-green-600 text-xs mt-1">
-                          ✅Account number successfully added!
-                        </p>
-                      )
-                    )}
-
-                    {suggestions.length > 0 && (
-                      <ul className="absolute bg-white border rounded shadow-md mt-1 w-full max-h-40 overflow-y-auto z-10">
-                        {suggestions.map((item, index) => (
-                          <li
-                            key={index}
-                            className="px-3 py-2 hover:bg-blue-100 cursor-pointer text-sm"
-                            onClick={() => {
-                              seteAccountNo(item); // Autofill on click
-                              setSuggestions([]); // Hide dropdown
-                            }}
-                          >
-                            {item.eAccountNo}
-                          </li>
-                        ))}
-                      </ul>
                     )}
                   </div>
 
+                  {/* Password */}
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block text-blueGray-600 text-sm mb-2"
-                      htmlFor="grid-password"
-                    >
+                    <label className="block text-blueGray-600 text-sm mb-2">
                       Password
                     </label>
                     <input
@@ -228,39 +154,105 @@ export default function Register() {
                     )}
                   </div>
 
-                  {/* <div>
-                    <label className="inline-flex items-center cursor-pointer">
-                      <input
-                        id="customCheckLogin"
-                        type="checkbox"
-                        className="form-checkbox border-0 rounded text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150"
-                      />
-                      <span className="ml-2 text-sm font-semibold text-blueGray-600">
-                        I agree with the{" "}
-                        <a
-                          href="#pablo"
-                          className="text-lightBlue-500"
-                          onClick={(e) => e.preventDefault()}
-                        >
-                          Privacy Policy
-                        </a>
-                      </span>
+                  {/* Role */}
+                  <div className="relative w-full mb-3">
+                    <label className="block text-blueGray-600 text-sm mb-2">
+                      Select Role
                     </label>
-                  </div> */}
+                    <select
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      className="border-0 px-3 h-0.5 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                    >
+                      <option value="USER">USER</option>
+                      <option value="ADMIN">ADMIN</option>
+                      <option value="EVOWNER">EV Owner</option>
+                      <option value="ROOFTOPSOLAROWNER">
+                        Rooftop Solar Owner
+                      </option>
+                    </select>
+                  </div>
+
+                  {/* EVOWNER fields */}
+                  {role === "EVOWNER" && (
+                    <>
+                      <div className="relative w-full mb-3">
+                        <label className="block text-blueGray-600 text-sm mb-2">
+                          Mobile Number
+                        </label>
+                        <input
+                          type="text"
+                          className="border-0 px-3 h-0.5 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="0771234567"
+                          maxLength={10}
+                          value={mobileNumber}
+                          onChange={(e) => setMobileNumber(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="relative w-full mb-3">
+                        <label className="block text-blueGray-600 text-sm mb-2">
+                          No. of Vehicles
+                        </label>
+                        <input
+                          type="number"
+                          className="border-0 px-3 h-0.5 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          min={1}
+                          value={noOfVehiclesOwned}
+                          onChange={(e) =>
+                            setNoOfVehiclesOwned(parseInt(e.target.value))
+                          }
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {/* ROOFTOPSOLAROWNER fields */}
+                  {role === "ROOFTOPSOLAROWNER" && (
+                    <>
+                      <div className="relative w-full mb-3">
+                        <label className="block text-blueGray-600 text-sm mb-2">
+                          Address
+                        </label>
+                        <input
+                          type="text"
+                          className="border-0 px-3 h-0.5 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="Address"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="relative w-full mb-3">
+                        <label className="block text-blueGray-600 text-sm mb-2">
+                          Solar Capacity (kW)
+                        </label>
+                        <input
+                          type="number"
+                          className="border-0 px-3 h-0.5 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          min={0}
+                          value={solarCapacity}
+                          onChange={(e) =>
+                            setSolarCapacity(parseFloat(e.target.value))
+                          }
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div className="text-center mt-6">
                     <button
                       className="text-white active:bg-red-600 text-sm px-6 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
                       type="submit"
                       style={{ backgroundColor: "#7c0000" }}
-                      disabled={isRegistered}
                     >
-                      {isRegistered ? "Registering..." : "Create Account"}
+                      Create Account
                     </button>
                   </div>
                 </form>
               </div>
             </div>
+
             <div className="flex flex-wrap mt-6 justify-center relative">
               <div className="w-1/2 text-blueGray-400 text-sm">
                 Have an account?{" "}
@@ -271,7 +263,6 @@ export default function Register() {
             </div>
           </div>
         </div>
-        <ToastContainer />
       </div>
     </>
   );

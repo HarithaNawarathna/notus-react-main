@@ -28,7 +28,7 @@ const UserDropdown = () => {
   const handleLogout = async () => {
     // Handle logout logic here
     try {
-      const response = await fetch(`${baseUrl}/api/v1/logout`, {
+      const response = await fetch(`${baseUrl}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
