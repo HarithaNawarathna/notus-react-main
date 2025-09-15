@@ -33,17 +33,19 @@ export default function Login() {
       }
 
       if (response.ok) {
+        console.log("Login successful:", data);
         // Store JWT token
-        sessionStorage.setItem("token", data.jwtToken);
+        sessionStorage.setItem("token", data.token);
 
         // Store user details if backend sends them
         if (data.username) sessionStorage.setItem("username", data.username);
-        if (data.userLevel) sessionStorage.setItem("userLevel", data.userLevel);
+        if (data.roles) sessionStorage.setItem("Roles", data.roles[0]);
         if (data.eAccountNo)
           sessionStorage.setItem("eAccountNo", data.eAccountNo);
         sessionStorage.setItem("sessionStart", Date.now().toString());
 
-        const userlevel = data.userLevel;
+        const Roles = data.roles[0]; // remove prefix
+        sessionStorage.setItem("userLevel", Roles);
 
         console.log("Session storage saved:", {
           token: sessionStorage.getItem("token"),
@@ -54,12 +56,13 @@ export default function Login() {
         });
 
         // Redirect based on user level
-        if (userlevel === "CE") {
-          history.push("/admin/dashboardCE");
-        } else if (userlevel === "EE") {
-          history.push("/admin/dashboardEE");
+        if (Roles === "ROLE_EVOWNER") {
+          console.log("Redirecting to /admin/EvDashboard");
+          history.push("/admin/evdashboard");
+        } else if (Roles === "ROLE_SOLAROWNER") {
+          history.push("/admin/dashboardsolar");
         } else {
-          history.push("/admin/maps");
+          //history.push("/admin/maps");
         }
 
         toast.success("Login successful!", {

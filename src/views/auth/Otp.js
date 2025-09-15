@@ -59,7 +59,7 @@ export default function Login() {
 
         setTimeout(() => {
           history.push("/auth/login"); // redirect to login page
-        }, 10000);
+        }, 6000);
       } else {
         toast.error(data.message || "OTP verification failed", {
           position: "top-right",

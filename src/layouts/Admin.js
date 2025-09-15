@@ -16,6 +16,9 @@ import DashboardEE from "views/admin/DashboardEE";
 import Maps from "views/admin/Maps.js";
 import Settings from "views/admin/Settings.js";
 import Tables from "views/admin/Tables.js";
+import EvDashboard from "views/admin/DashboardEV.js";
+import DashboardSOLAR from "views/admin/DashboardSOLAR";
+import Payment from "views/admin/Payment";
 
 export default function Admin() {
   return (
@@ -33,6 +36,13 @@ export default function Admin() {
             <Route path="/admin/maps" exact component={Maps} />
             <Route path="/admin/settings" exact component={Settings} />
             <Route path="/admin/tables" exact component={Tables} />
+            <Route path="/admin/evdashboard" exact component={EvDashboard} />
+            <Route path="/admin/payment" exact component={Payment} />
+            <Route
+              path="/admin/dashboardsolar"
+              exact
+              component={DashboardSOLAR}
+            />
             <Redirect from="/admin" to="/admin/dashboard" />
           </Switch>
           <FooterAdmin />

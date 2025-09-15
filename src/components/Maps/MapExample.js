@@ -98,9 +98,9 @@ function MapExample() {
 
       L.marker([location.latitude, location.longitude], { icon })
         .addTo(map)
-        .bindPopup(
+        .bindTooltip(
           `<b>${location.name}</b><br>Status: ${location.status}<br>Charge: ${
-            location.chargeLevel || 0
+            location.solarPowerAvailable || 0
           }%`
         );
     });
@@ -149,6 +149,7 @@ function MapExample() {
           }
 
           // Add new user marker
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           userMarker = L.marker([userLat, userLng], { icon: carIcon })
             .addTo(map)
             .bindPopup("<b>Your Car</b>")
@@ -158,7 +159,7 @@ function MapExample() {
           const availableStations = locations.filter(
             (station) => station.status?.toLowerCase() === "available"
           );
-
+          console.log("Available Stations:", availableStations);
           if (availableStations.length === 0) return;
 
           const nearestStation = availableStations.reduce((prev, curr) => {
